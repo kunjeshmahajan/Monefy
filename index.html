@@ -10,97 +10,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <!-- Password Gate -->
-  <div id="authGate" class="auth-gate">
-    <div id="authSetup" class="auth-card">
-      <div class="auth-icon">🔐</div>
-      <h2>Create your password</h2>
-      <p class="auth-sub">First time here? Set a password to protect your finance data.</p>
-      <form id="setupForm" class="auth-form">
-        <div class="field">
-          <label for="setupPassword">Password</label>
-          <input type="password" id="setupPassword" placeholder="Min. 6 characters" minlength="6" required autocomplete="new-password">
-        </div>
-        <div class="field">
-          <label for="setupConfirm">Confirm password</label>
-          <input type="password" id="setupConfirm" placeholder="Re-enter password" minlength="6" required autocomplete="new-password">
-        </div>
-        <div class="field">
-          <label for="setupEmail">Recovery email</label>
-          <input type="email" id="setupEmail" placeholder="you@email.com" required autocomplete="email">
-          <p class="field-hint">Used to receive OTP if you forget your password</p>
-        </div>
-        <p id="setupError" class="auth-error hidden"></p>
-        <button type="submit" class="submit-btn auth-submit">Create password &amp; continue</button>
-      </form>
-    </div>
-
-    <div id="authLogin" class="auth-card hidden">
-      <div class="auth-icon">🔒</div>
-      <h2>Welcome back</h2>
-      <p class="auth-sub">Enter your password to open your finance tracker.</p>
-      <form id="loginForm" class="auth-form">
-        <div class="field">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="Your password" required autocomplete="current-password">
-        </div>
-        <p id="loginError" class="auth-error hidden"></p>
-        <button type="submit" class="submit-btn auth-submit">Unlock</button>
-      </form>
-      <button type="button" class="auth-link" id="gotoForgot">Forgot password?</button>
-    </div>
-
-    <div id="authForgot" class="auth-card hidden">
-      <div class="auth-icon">📧</div>
-      <h2>Reset password</h2>
-      <p class="auth-sub">Enter your recovery email. We'll generate a 6-digit OTP.</p>
-      <form id="forgotForm" class="auth-form">
-        <div class="field">
-          <label for="forgotEmail">Recovery email</label>
-          <input type="email" id="forgotEmail" placeholder="you@email.com" required autocomplete="email">
-        </div>
-        <p id="forgotError" class="auth-error hidden"></p>
-        <button type="submit" class="submit-btn auth-submit">Send OTP</button>
-      </form>
-      <button type="button" class="auth-link" id="backFromForgot">← Back to login</button>
-    </div>
-
-    <div id="authReset" class="auth-card hidden">
-      <div class="auth-icon">🔑</div>
-      <h2>Enter OTP</h2>
-      <p class="auth-sub">OTP for <strong id="otpSentEmail"></strong></p>
-      <div class="otp-box">
-        <p class="otp-label">Your 6-digit OTP</p>
-        <p class="otp-code" id="otpDisplayCode">------</p>
-        <p class="otp-note" id="otpExpiryHint">Valid for 10 minutes</p>
-        <p class="otp-hint">This app runs locally — OTP is shown here. Remember your recovery email to reset access.</p>
-      </div>
-      <form id="resetForm" class="auth-form">
-        <div class="field">
-          <label for="resetOtp">OTP</label>
-          <input type="text" id="resetOtp" placeholder="6-digit code" maxlength="6" pattern="\d{6}" inputmode="numeric" required>
-        </div>
-        <div class="field">
-          <label for="resetPassword">New password</label>
-          <input type="password" id="resetPassword" placeholder="Min. 6 characters" minlength="6" required autocomplete="new-password">
-        </div>
-        <div class="field">
-          <label for="resetConfirm">Confirm new password</label>
-          <input type="password" id="resetConfirm" placeholder="Re-enter password" minlength="6" required autocomplete="new-password">
-        </div>
-        <p id="resetError" class="auth-error hidden"></p>
-        <button type="submit" class="submit-btn auth-submit">Reset password</button>
-      </form>
-      <button type="button" class="auth-link" id="resendOtpBtn">Resend OTP</button>
-      <button type="button" class="auth-link" id="backToLogin">← Back to login</button>
-    </div>
-  </div>
-
-  <div class="app hidden" id="mainApp">
+  <div class="app" id="mainApp">
     <header class="header animate-in">
       <div class="header-top">
         <div class="header-badge">💰 Finance Tracker</div>
-        <button type="button" class="logout-btn" id="logoutBtn" title="Lock app">🔒 Lock</button>
       </div>
       <h1>Personal Finance</h1>
       <p class="subtitle">Track income, expenses &amp; insights</p>
@@ -241,7 +154,6 @@
     </div>
   </div>
 
-  <script src="auth.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
