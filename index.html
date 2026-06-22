@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0f1117">
+  <meta name="color-scheme" content="dark">
+  <title>Personal Finance Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Password Gate -->
+  <div id="authGate" class="auth-gate">
+    <div id="authSetup" class="auth-card">
+      <div class="auth-icon">🔐</div>
+      <h2>Create your password</h2>
+      <p class="auth-sub">First time here? Set a password to protect your finance data.</p>
+      <form id="setupForm" class="auth-form">
+        <div class="field">
+          <label for="setupPassword">Password</label>
+          <input type="password" id="setupPassword" placeholder="Min. 6 characters" minlength="6" required autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label for="setupConfirm">Confirm password</label>
+          <input type="password" id="setupConfirm" placeholder="Re-enter password" minlength="6" required autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label for="setupEmail">Recovery email</label>
+          <input type="email" id="setupEmail" placeholder="you@email.com" required autocomplete="email">
+          <p class="field-hint">Used to receive OTP if you forget your password</p>
+        </div>
+        <p id="setupError" class="auth-error hidden"></p>
+        <button type="submit" class="submit-btn auth-submit">Create password &amp; continue</button>
+      </form>
+    </div>
+
+    <div id="authLogin" class="auth-card hidden">
+      <div class="auth-icon">🔒</div>
+      <h2>Welcome back</h2>
+      <p class="auth-sub">Enter your password to open your finance tracker.</p>
+      <form id="loginForm" class="auth-form">
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Your password" required autocomplete="current-password">
+        </div>
+        <p id="loginError" class="auth-error hidden"></p>
+        <button type="submit" class="submit-btn auth-submit">Unlock</button>
+      </form>
+      <button type="button" class="auth-link" id="gotoForgot">Forgot password?</button>
+    </div>
+
+    <div id="authForgot" class="auth-card hidden">
+      <div class="auth-icon">📧</div>
+      <h2>Reset password</h2>
+      <p class="auth-sub">Enter your recovery email. We'll generate a 6-digit OTP.</p>
+      <form id="forgotForm" class="auth-form">
+        <div class="field">
+          <label for="forgotEmail">Recovery email</label>
+          <input type="email" id="forgotEmail" placeholder="you@email.com" required autocomplete="email">
+        </div>
+        <p id="forgotError" class="auth-error hidden"></p>
+        <button type="submit" class="submit-btn auth-submit">Send OTP</button>
+      </form>
+      <button type="button" class="auth-link" id="backFromForgot">← Back to login</button>
+    </div>
+
+    <div id="authReset" class="auth-card hidden">
+      <div class="auth-icon">🔑</div>
+      <h2>Enter OTP</h2>
+      <p class="auth-sub">OTP for <strong id="otpSentEmail"></strong></p>
+      <div class="otp-box">
+        <p class="otp-label">Your 6-digit OTP</p>
+        <p class="otp-code" id="otpDisplayCode">------</p>
+        <p class="otp-note" id="otpExpiryHint">Valid for 10 minutes</p>
+        <p class="otp-hint">This app runs locally — OTP is shown here. Remember your recovery email to reset access.</p>
+      </div>
+      <form id="resetForm" class="auth-form">
+        <div class="field">
+          <label for="resetOtp">OTP</label>
+          <input type="text" id="resetOtp" placeholder="6-digit code" maxlength="6" pattern="\d{6}" inputmode="numeric" required>
+        </div>
+        <div class="field">
+          <label for="resetPassword">New password</label>
+          <input type="password" id="resetPassword" placeholder="Min. 6 characters" minlength="6" required autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label for="resetConfirm">Confirm new password</label>
+          <input type="password" id="resetConfirm" placeholder="Re-enter password" minlength="6" required autocomplete="new-password">
+        </div>
+        <p id="resetError" class="auth-error hidden"></p>
+        <button type="submit" class="submit-btn auth-submit">Reset password</button>
+      </form>
+      <button type="button" class="auth-link" id="resendOtpBtn">Resend OTP</button>
+      <button type="button" class="auth-link" id="backToLogin">← Back to login</button>
+    </div>
+  </div>
+
+  <div class="app hidden" id="mainApp">
+    <header class="header animate-in">
+      <div class="header-top">
+        <div class="header-badge">💰 Finance Tracker</div>
+        <button type="button" class="logout-btn" id="logoutBtn" title="Lock app">🔒 Lock</button>
+      </div>
+      <h1>Personal Finance</h1>
+      <p class="subtitle">Track income, expenses &amp; insights</p>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="summary">
+      <div class="card card-income animate-in" style="--i:0">
+        <span class="card-icon">↓</span>
+        <span class="card-label">Total income</span>
+        <span class="card-value income" id="totalIncome" data-value="0">₹0</span>
+      </div>
+      <div class="card card-expense animate-in" style="--i:1">
+        <span class="card-icon">↑</span>
+        <span class="card-label">Total expenses</span>
+        <span class="card-value expense" id="totalExpenses" data-value="0">₹0</span>
+      </div>
+      <div class="card card-balance animate-in" style="--i:2">
+        <span class="card-icon">⚖</span>
+        <span class="card-label">Balance</span>
+        <span class="card-value balance" id="balance" data-value="0">₹0</span>
+      </div>
+      <div class="card card-count animate-in" style="--i:3">
+        <span class="card-icon">📋</span>
+        <span class="card-label">Transactions</span>
+        <span class="card-value count" id="txCount" data-value="0">0</span>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs" id="tabsNav">
+      <button class="tab active" data-tab="add"><span class="tab-icon">＋</span> Add</button>
+      <button class="tab" data-tab="transactions"><span class="tab-icon">☰</span> Transactions</button>
+      <button class="tab" data-tab="charts"><span class="tab-icon">▦</span> Charts</button>
+      <button class="tab" data-tab="insights"><span class="tab-icon">💡</span> Insights</button>
+      <div class="tab-indicator" id="tabIndicator" aria-hidden="true"></div>
+    </nav>
+
+    <div class="panels">
+      <!-- Add Tab -->
+      <section class="panel active" id="panel-add">
+        <div class="form-card">
+          <h2>Add Transaction</h2>
+          <form id="txForm">
+            <div class="type-toggle" id="typeToggle">
+              <div class="type-slider" id="typeSlider"></div>
+              <button type="button" class="type-btn active" data-type="expense">↑ Expense</button>
+              <button type="button" class="type-btn" data-type="income">↓ Income</button>
+            </div>
+
+            <div class="field">
+              <label for="description">Description</label>
+              <input type="text" id="description" placeholder="e.g. Groceries, Movie night..." required>
+            </div>
+
+            <div class="field">
+              <label for="amount">Amount (₹)</label>
+              <input type="number" id="amount" placeholder="0" min="0.01" step="0.01" required>
+            </div>
+
+            <div class="field">
+              <label for="category">Category</label>
+              <select id="category" required></select>
+              <div class="category-chips" id="categoryChips"></div>
+            </div>
+
+            <div class="field">
+              <label for="date">Date</label>
+              <input type="date" id="date" required>
+              <p class="field-hint">Pick any past date to record existing transactions</p>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <span class="btn-text">+ Add transaction</span>
+              <span class="btn-loader"></span>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Transactions Tab -->
+      <section class="panel" id="panel-transactions">
+        <div class="form-card">
+          <div class="panel-header">
+            <h2>All Transactions <span class="badge" id="txBadge">0</span></h2>
+            <div class="filters">
+              <select id="filterType">
+                <option value="all">All types</option>
+                <option value="expense">Expenses only</option>
+                <option value="income">Income only</option>
+              </select>
+              <select id="filterCategory">
+                <option value="all">All categories</option>
+              </select>
+              <input type="month" id="filterMonth" title="Filter by month">
+              <button type="button" class="clear-filters" id="clearFilters" title="Clear filters">✕</button>
+            </div>
+          </div>
+          <div id="txList" class="tx-list"></div>
+        </div>
+      </section>
+
+      <!-- Charts Tab -->
+      <section class="panel" id="panel-charts">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Expense by Category</h3>
+            <canvas id="categoryChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Income vs Expenses</h3>
+            <canvas id="incomeExpenseChart"></canvas>
+          </div>
+          <div class="chart-card full-width">
+            <h3>Monthly Trend (Last 6 Months)</h3>
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Insights Tab -->
+      <section class="panel" id="panel-insights">
+        <div class="insights-grid" id="insightsContainer"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-icon">🗑️</div>
+      <h3>Delete transaction?</h3>
+      <p id="deleteModalText">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn cancel" id="cancelDelete">Cancel</button>
+        <button type="button" class="modal-btn confirm" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
