@@ -748,23 +748,11 @@ function initModal() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // App starts after auth unlocks via window.initFinanceApp
-});
-
-let appInitialized = false;
-
-window.initFinanceApp = function initFinanceApp() {
   transactions = loadData();
-  if (appInitialized) {
-    refresh();
-    setTimeout(scheduleTabIndicatorUpdate, 100);
-    return;
-  }
-  appInitialized = true;
   initTabs();
   initForm();
   initFilters();
   initModal();
   refresh();
   setTimeout(scheduleTabIndicatorUpdate, 100);
-};
+});
